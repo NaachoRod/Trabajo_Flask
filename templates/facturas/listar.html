@@ -22,7 +22,7 @@
             <td>{{ f.id_factura }}</td>
             <td>{{ f.cliente.nombre }}</td>
             <td>{{ f.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
-            <td class="text-end">${{ '%.2f'|format(f.total) }}</td>
+            <td class="text-end">${{ "{:,.2f}".format(f.total) }}</td>
           </tr>
         {% else %}
           <tr><td colspan="4" class="text-center text-muted">Sin registros</td></tr>

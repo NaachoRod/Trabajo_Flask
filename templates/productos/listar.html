@@ -23,7 +23,7 @@
             <td>{{ p.base or '-' }}</td>
             <td>{{ p.presentacion_litros or '-' }}</td>
             <td>{{ p.codigo_barra or '-' }}</td>
-            <td>${{ '%.2f'|format(p.precio) }}</td>
+            <td>${{ "{:,.2f}".format(p.precio) }}</td>
             <td>{{ p.stock }}</td>
             <td class="text-end">
               <a class="btn btn-sm btn-warning" href="{{ url_for('productos_editar', id=p.id_producto) }}">Editar</a>
