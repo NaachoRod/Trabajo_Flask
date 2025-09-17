@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="h4 mb-3">Nueva Factura</h2>
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Cliente *</label>
+    <select name="id_cliente" class="form-select" required>
+      <option value="">-- Elegir --</option>
+      {% for c in clientes %}
+        <option value="{{ c.id_cliente }}">{{ c.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div id="items" class="mb-3">
+    <div class="row g-2 align-items-end item">
+      <div class="col-md-8">
+        <label class="form-label">Producto</label>
+        <select name="id_producto" class="form-select">
+          {% for p in productos %}
+            <option value="{{ p.id_producto }}">{{ p.descripcion }} - ${{ '%.2f'|format(p.precio) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Cantidad</label>
+        <input name="cantidad" type="number" value="1" min="1" class="form-control">
+      </div>
+      <div class="col-md-2">
+        <button type="button" class="btn btn-outline-secondary w-100" onclick="agregarItem()">Agregar</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-success">Emitir</button>
+  <a class="btn btn-secondary" href="{{ url_for('facturas_listar') }}">Cancelar</a>
+</form>
+
+<script>
+function agregarItem(){
+  const cont = document.getElementById('items');
+  const first = cont.querySelector('.item');
+  const clone = first.cloneNode(true);
+  cont.appendChild(clone);
+}
+</script>
+{% endblock %}
