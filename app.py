@@ -35,26 +35,24 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        nombre = request.form.get("nombre")
-        email = request.form.get("email")
+        nombre = (request.form.get("nombre") or "").strip()
+        email = (request.form.get("email") or "").strip().lower()
         password = request.form.get("password")
-
         if not nombre or not email or not password:
-            flash("Completá todos los campos", "danger")
+            flash("Todos los campos son obligatorios", "danger")
             return redirect(url_for("register"))
-
         if Usuario.query.filter_by(email=email).first():
             flash("Ese email ya está registrado", "danger")
             return redirect(url_for("register"))
+        u = Usuario(nombre=nombre, email=email)
+        u.set_password(password)
 
-        user = Usuario(nombre=nombre, email=email)
-        user.set_password(password)
-        db.session.add(user)
+        db.session.add(u)
         db.session.commit()
-        flash("Usuario creado. Ahora iniciá sesión.", "success")
+        flash("Registro exitoso. Ahora podés iniciar sesión", "success")
         return redirect(url_for("login"))
 
-    return render_template("auth/register.html", titulo="Registro")
+    return render_template("auth/register.html", titulo="Registrarse")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -71,6 +69,7 @@ def login():
         flash(f"Bienvenido {user.nombre}", "success")
         return redirect(request.args.get("next") or url_for("index"))
     return render_template("auth/login.html", titulo="Login")
+
 
 @app.get("/logout")
 def logout():
@@ -131,25 +130,42 @@ def productos_listar():
 @app.route("/productos/crear", methods=["GET","POST"])
 def productos_crear():
     if request.method == "POST":
-        desc = request.form.get("descripcion")
-        precio = request.form.get("precio", type=float)
+        desc = (request.form.get("descripcion") or "").strip()
+        precio_txt = (request.form.get("precio") or "").replace(",", "")
+        try:
+            precio = float(precio_txt)
+        except ValueError:
+            precio = None
+
+        stock = request.form.get("stock", type=int)
+        if stock is None:
+            stock = 0
         if not desc or precio is None:
             flash("Descripción y precio son obligatorios", "danger")
             return redirect(url_for("productos_crear"))
+        if precio < 0 or stock < 0:
+            flash("Precio y stock no pueden ser negativos", "danger")
+            return redirect(url_for("productos_crear"))
+
+        presentacion_litros = request.form.get("presentacion_litros", type=float)
+        if presentacion_litros is None:
+            presentacion_litros = None
+
         p = Producto(
             descripcion=desc,
             marca=request.form.get("marca"),
             color=request.form.get("color"),
             base=request.form.get("base"),
-            presentacion_litros=request.form.get("presentacion_litros", type=float),
+            presentacion_litros=presentacion_litros,
             codigo_barra=request.form.get("codigo_barra"),
             precio=precio,
-            stock=request.form.get("stock", type=int) or 0
+            stock=stock
         )
         db.session.add(p)
         db.session.commit()
         flash("Producto creado", "success")
         return redirect(url_for("productos_listar"))
+
     return render_template("productos/crear.html", titulo="Nuevo Producto")
 
 @app.route("/productos/<int:id>/editar", methods=["GET","POST"])

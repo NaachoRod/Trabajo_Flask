@@ -1,7 +1,7 @@
 import os
 
 class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "cambia-esto")
+    SECRET_KEY = os.getenv("SECRET_KEY", "cambiar-esto")
     MYSQL_USER = os.getenv("MYSQL_USER", "root")
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
     MYSQL_HOST = os.getenv("MYSQL_HOST", "127.0.0.1")
